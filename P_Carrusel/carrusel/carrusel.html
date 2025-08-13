@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+.simple-carousel {
+  position: relative;
+  width: 560px; /* o 80% si prefieres responsivo */
+  max-width: 90vw;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.simple-carousel img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
+  transition: opacity 0.5s ease;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  background: #e6f0ff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  color: #007bff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Están un poco hacia afuera pero pegados a la imagen */
+.carousel-btn.left {
+  left: -70px;  /* puedes ajustar a -15px o -10px si aún están lejos */
+}
+
+.carousel-btn.right {
+  right: -70px; /* igual que el de la izquierda */
+}
+
+
+@media (max-width: 480px) {
+  .carousel-btn.left {
+    left: -25px;
+  }
+
+  .carousel-btn.right {
+    right: -25px;
+  }
+}
+    </style>
+    <title>Lucky Spin</title>
+</head>
+<body>
+<div class="simple-carousel">
+  <button class="carousel-btn left" onclick="prevImage()">❮</button>
+  
+  <img id="carouselImage" src="carrusel/img/1_family-picnic.png" alt="Slide" />
+
+  <button class="carousel-btn right" onclick="nextImage()">❯</button>
+</div>
+	
+<script>
+  const images = [
+    'carrusel/img/1_family-picnic.png',
+    'carrusel/img/2_lunch-gathering.jpg',
+    'carrusel/img/3_office-meeting.jpg',
+    'carrusel/img/4_pastry-shop-gathering.jpg',
+    'carrusel/img/5_campus-festival.jpg'
+  ];
+
+  let currentIndex = 0;
+  const imgElement = document.getElementById('carouselImage');
+
+  // 1. Declara el objeto de audio
+  const carouselAudio = new Audio('carrusel/audios/Subtle.mp3');
+
+  function showImage(index) {
+    imgElement.style.opacity = 0;
+    setTimeout(() => {
+      imgElement.src = images[index];
+      imgElement.style.opacity = 1;
+    }, 200);
+  }
+
+  function prevImage() {
+    // 2. Reproduce el audio antes de cambiar la imagen
+    carouselAudio.currentTime = 0;
+    carouselAudio.play();
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    showImage(currentIndex);
+  }
+
+  function nextImage() {
+    // 3. Reproduce el audio antes de cambiar la imagen
+    carouselAudio.currentTime = 0;
+    carouselAudio.play();
+    currentIndex = (currentIndex + 1) % images.length;
+    showImage(currentIndex);
+  }
+</script>
+</body>
+</html>
