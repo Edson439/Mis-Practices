@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juego de Tarjetas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+	.grid {
+	  display: grid;
+	  grid-template-columns: repeat(5, 130px); /* más pequeño */
+	  grid-template-rows: repeat(4, 130px);
+	  gap: 8px;
+	  justify-content: center;
+	  margin-top: 25px;
+	}
+
+	.card {
+	  background-color: #e6f0ff;
+	  font-size: 60px;
+	  border-radius: 10px;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  cursor: pointer;
+	  font-weight: bold;
+	  color: #1a3473;
+	}
+
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .reset-btn {
+      background: #1a3473;
+      color: white;
+      border: none;
+      padding: 6px 80px;
+      border-radius: 6px;
+      font-size: 28px;
+      cursor: pointer;
+	  margin-top: 30px;
+    }
+.reset-btn:hover {
+    background-color: #2955a5;
+    transform: scale(1.05); /* Aumenta el tamaño un 5% */
+}
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .modal-content {
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+      border-radius: 10px;
+      position: relative;
+    }
+
+
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 25px; height: 25px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+	  .popup-video {
+	  width: 600px;
+	  height: 600px;
+	  border-radius: 12px;
+	  box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+	  display: block;
+	}
+	  .close-btn {
+	  position: absolute;
+	  top: 10px;
+	  right: 10px;
+	  background: red;
+	  border: none;
+	  border-radius: 50%;
+	  width: 30px;
+	  height: 30px;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  cursor: pointer;
+	  padding: 0;
+	  z-index: 100;
+	}
+
+	.close-btn i {
+	  color: white;
+	  font-size: 16px;
+	  pointer-events: none; /* ← permite que el clic llegue al botón, no al ícono */
+	}
+
+  </style>
+</head>
+<body>
+
+  <div class="grid" id="grid"></div>
+  <button class="reset-btn" onclick="resetGame()"><i class="fas fa-rotate-left"></i></button>
+
+  <div class="modal" id="modal" style="display:none;">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">
+	  <i class="fas fa-times"></i>
+	</button>
+
+      <video id="modalVideo" class="popup-video" muted autoplay loop></video>
+    </div>
+  </div>
+
+<script>
+	// --- Agregar al inicio del script, debajo de las variables (como te había dicho) ---
+	// NOTA: Esta es la parte que tienes que mover arriba, antes de la función handleClick
+	const names = [
+		'01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+		'11', '12', '13', '14', '15', '16', '17', '18', '19', '20'
+	];
+
+	let shuffled = [];
+	let selected = [];
+	let revealed = Array(20).fill(false);
+
+	const grid = document.getElementById('grid');
+	const audio = new Audio('assets/audios/Open.wav');
+	const audioRes = new Audio('assets/audios/Res.wav');
+
+	function shuffle(array) {
+		return array.sort(() => Math.random() - 0.5);
+	}
+
+	function renderGrid() {
+		grid.innerHTML = '';
+		for (let i = 0; i < 20; i++) {
+			const card = document.createElement('div');
+			card.classList.add('card');
+			card.dataset.index = i;
+
+			if (revealed[i]) {
+				const video = document.createElement('video');
+				video.src = `assets/videos/${shuffled[i]}.mp4`;
+				video.muted = true;
+				video.playsInline = true;
+				video.style.width = "100%";
+				video.style.height = "100%";
+				video.style.borderRadius = "10px";
+				video.setAttribute("preload", "metadata");
+				card.appendChild(video);
+			} else {
+				card.textContent = i + 1;
+			}
+
+			card.addEventListener('click', handleClick);
+			grid.appendChild(card);
+		}
+	}
+
+	function handleClick(e) {
+		const index = parseInt(e.currentTarget.dataset.index);
+		if (revealed[index] || selected.includes(index)) return;
+
+		// --- El código para el audio está bien aquí ---
+		audio.currentTime = 0;
+		audio.play();
+		
+		selected.push(index);
+		revealTemporary(index);
+
+		setTimeout(() => {
+			showModal(index);
+		}, 300);
+	}
+
+	function revealTemporary(index) {
+		const card = document.querySelector(`.card[data-index='${index}']`);
+		const video = document.createElement('video');
+		video.src = `assets/videos/${shuffled[index]}.mp4`;
+		video.muted = true;
+		video.playsInline = true;
+		video.setAttribute("preload", "metadata");
+		video.style.width = "100%";
+		video.style.height = "100%";
+		video.style.borderRadius = "10px";
+		card.innerHTML = '';
+		card.appendChild(video);
+	}
+
+	function showModal(index) {
+		const video = document.getElementById('modalVideo');
+		video.src = `assets/videos/${shuffled[index]}.mp4`;
+		video.load();
+		document.getElementById('modal').style.display = 'flex';
+	}
+
+	function closeModal() {
+		const video = document.getElementById('modalVideo');
+		video.pause();
+		video.currentTime = 0;
+		video.src = '';
+		document.getElementById('modal').style.display = 'none';
+		revealed[selected[0]] = true;
+		selected = [];
+		renderGrid();
+	}
+
+	function resetGame() {
+    audioRes.play();
+
+    shuffled = shuffle([...names]);
+    revealed = Array(20).fill(false);
+    selected = [];
+    renderGrid();
+}
+
+	resetGame();
+</script>
+</body>
+</html>

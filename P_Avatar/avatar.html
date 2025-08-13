@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatr QL</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+        }
+        .container {
+            display: flex;
+            border: none;
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            max-height: 800px;
+            overflow: hidden;
+            background-color: #fff; /* Fondo del contenedor */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra */
+            border-radius: 8px; /* Bordes redondeados */
+        }
+
+        .left-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 20px;
+            background-color: #e6f0ff;
+            overflow-y: auto;
+        }
+
+        .right-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        .dropdown-btn {
+            background-color: #1a3473;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+			height: 50px;
+            text-align: center;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+            font-size: 1.1em;
+            border-radius: 4px; /* Bordes redondeados */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sutil sombra */
+        }
+
+        .dropdown-btn.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .dropdown-btn:hover {
+            background-color: #2955a5;
+        }
+
+        .dropdown-content {
+            display: none;
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            border-radius: 4px; /* Bordes redondeados */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sutil sombra */
+        }
+
+        .square-image {
+            width: 45%;
+            height: auto;
+            max-width: 100px;
+            object-fit: cover;
+            border: none;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 4px; /* Bordes redondeados */
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .square-image:hover {
+            transform: scale(1.1); /* Efecto de escala al pasar el ratón */
+        }
+
+        .right-panel .square-image {
+            width: 80%;
+            height: auto;
+            max-width: 400px;
+            border-radius: 8px; /* Bordes redondeados */
+        }
+
+        .right-panel .extra-image {
+            width: 127px;
+            height: 82.5px;
+            object-fit: cover;
+            margin-top: 10px;
+            border-radius: 4px; /* Bordes redondeados */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sutil sombra */
+        }
+
+        .reset-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+			height: 50px;
+            text-align: center;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+            font-size: 1.1em;
+            border-radius: 4px; /* Bordes redondeados */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sutil sombra */
+        }
+
+        .reset-btn:hover {
+            background-color: #1976d2;
+        }
+
+		.square-image2 {
+		  width: 100px;
+		  height: 100px;
+		  object-fit: cover;
+		  border-radius: 12px;
+		  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}.flag-container {
+		  display: flex;
+		  flex-wrap: wrap;
+		  gap: 16px;
+		  justify-content: center;
+		  padding: 20px;
+		}
+
+		.flag-image {
+		  width: 120px;
+		  height: 80px;
+		  border-radius: 12px;
+		  object-fit: cover;
+		  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
+    </style>
+</head>
+<body> 
+    <div class="container">
+        <div class="left-panel">
+            <button class="dropdown-btn enabled" id="btn1"><img src="assets/img/iconos-01.png" height="30px"></button>
+            <div class="dropdown-content" id="content1">
+                <img src="assets/img/Genero/femenino.jpg" alt="Imagen Cuadrada 1" class="square-image lazy" id="img1">
+                <img src="assets/img/Genero/masculino.jpg" alt="Imagen Cuadrada 2" class="square-image lazy" id="img2">
+            </div>
+            <button class="dropdown-btn disabled" id="btn2"><img src="assets/img/iconos-02.png" height="30px"></button>
+            <div class="dropdown-content" id="content2">
+                <!-- Aquí se añadirán dinámicamente las imágenes del botón 2 -->
+            </div>
+            <button class="dropdown-btn disabled" id="btn3"><img src="assets/img/icono-03.png" height="30px"></button>
+            <div class="dropdown-content" id="content3">
+                <!-- Aquí se añadirán dinámicamente las imágenes del botón 3 -->
+            </div>
+            <button class="dropdown-btn disabled" id="btn4"><img src="assets/img/icono-04.png" height="30px"></button>
+            <div class="dropdown-content" id="content4">
+				<div class="flag-container">
+				  <img src="assets/img/Nacionalidad/Mexico.jpg" alt="México" class="flag-image">
+				  <img src="assets/img/Nacionalidad/Canada.jpg" alt="Canadá" class="flag-image">
+				  <img src="assets/img/Nacionalidad/China.jpg" alt="China" class="flag-image">
+				  <img src="assets/img/Nacionalidad/Japan.jpg" alt="Japón" class="flag-image">
+				  <img src="assets/img/Nacionalidad/Francia.jpg" alt="Francia" class="flag-image">
+				  <img src="assets/img/Nacionalidad/italia.jpg" alt="Italia" class="flag-image">
+				  <img src="assets/img/Nacionalidad/USA.jpg" alt="USA" class="flag-image">
+				  <img src="assets/img/Nacionalidad/india.jpg" alt="India" class="flag-image">
+				  <img src="assets/img/Nacionalidad/Brazil.jpg" alt="Brasil" class="flag-image">
+				  <img src="assets/img/Nacionalidad/UK.jpg" alt="UK" class="flag-image">
+				</div>
+            </div>
+            <button class="reset-btn" id="reset-btn"><img src="assets/img/icon-2.gif" height="30px"></button>
+        </div>
+        <div class="right-panel">
+            <img src="assets/img/Genero/adulto.webp" alt="Imagen Cuadrada" class="square-image lazy" id="main-image">
+        </div>
+    </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn1 = document.getElementById('btn1');
+        const content1 = document.getElementById('content1');
+        const btn2 = document.getElementById('btn2');
+        const content2 = document.getElementById('content2');
+        const btn3 = document.getElementById('btn3');
+        const content3 = document.getElementById('content3');
+        const btn4 = document.getElementById('btn4');
+        const content4 = document.getElementById('content4');
+        const mainImage = document.getElementById('main-image');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // PREPARA LOS AUDIOS AQUÍ
+        const audioButton = new Audio('assets/audios/Button.wav');
+        const audioRes = new Audio('assets/audios/Res.wav');
+
+        // Iniciar con el botón 1 descolapsado
+        content1.style.display = 'flex';
+        content2.style.display = 'none'; // Asegurar que el contenido del botón 2 esté colapsado
+        content3.style.display = 'none'; // Asegurar que el contenido del botón 3 esté colapsado
+        content4.style.display = 'none'; // Asegurar que el contenido del botón 4 esté colapsado
+
+        btn1.addEventListener('click', () => {
+            audioButton.currentTime = 0; // REPRODUCE EL AUDIO
+            audioButton.play(); // REPRODUCE EL AUDIO
+            content1.style.display = content1.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        content1.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                audioButton.currentTime = 0; // REPRODUCE EL AUDIO
+                audioButton.play(); // REPRODUCE EL AUDIO
+                mainImage.src = e.target.src;
+                showButton2Options(mainImage.src);
+                btn1.classList.add('disabled');
+                content1.style.display = 'none';
+                btn2.classList.remove('disabled');
+                content2.style.display = 'flex';
+            }
+        });
+
+        function showButton2Options(imageSrc) {
+            content2.innerHTML = ''; // Limpiar contenido anterior del botón 2
+
+            if (imageSrc.includes('femenino.jpg')) {
+                addImagesToButton2([
+                    'assets/img/Genero/femenino.jpg',
+                    'assets/img/edad/mujer_mayor.webp'
+                ]);
+            } else if (imageSrc.includes('masculino.jpg')) {
+                addImagesToButton2([
+                    'assets/img/Genero/masculino.jpg',
+                    'assets/img/edad/homer_mayor.jpg'
+                ]);
+            }
+        }
+
+        function addImagesToButton2(imageUrls) {
+            imageUrls.forEach(url => {
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Imagen Cuadrada';
+                img.className = 'square-image';
+                img.addEventListener('click', () => {
+                    audioButton.currentTime = 0; // REPRODUCE EL AUDIO
+                    audioButton.play(); // REPRODUCE EL AUDIO
+                    mainImage.src = img.src;
+                    showButton3Options(img.src);
+                    btn2.classList.add('disabled');
+                    content2.style.display = 'none';
+                    btn3.classList.remove('disabled');
+                    content3.style.display = 'flex';
+                });
+                content2.appendChild(img);
+            });
+        }
+
+        function showButton3Options(imageSrc) {
+            content3.innerHTML = ''; // Limpiar contenido anterior del botón 3
+            imageSrc = imageSrc.split('/').slice(-2).join('/');
+            
+            let imageUrls = [];
+            switch (imageSrc) {
+                case 'Genero/femenino.jpg':
+                    imageUrls = [
+                        'assets/img/Profesion/adulta/architect.webp',
+                        'assets/img/Profesion/adulta/conductor.webp',
+                        'assets/img/Profesion/adulta/ingeniero.webp',
+                        'assets/img/Profesion/adulta/granjera.webp',
+                        'assets/img/Profesion/adulta/doctora.webp',
+                        'assets/img/Profesion/adulta/policia.webp',
+                        'assets/img/Profesion/adulta/bombero.webp',
+                        'assets/img/Profesion/adulta/chef.webp',
+                        'assets/img/Profesion/adulta/enfermera.webp',
+                        'assets/img/Profesion/adulta/mecanico.webp',
+                        'assets/img/Profesion/adulta/piloto.webp',
+                        'assets/img/Profesion/adulta/mesera.webp'
+                    ];
+                    break;
+                case 'edad/mujer_mayor.webp':
+                    imageUrls = [
+                        'assets/img/Profesion/mujer_mayor/arquitecto.webp',
+                        'assets/img/Profesion/mujer_mayor/conductor.png',
+                        'assets/img/Profesion/mujer_mayor/ingeniero.webp',
+                        'assets/img/Profesion/mujer_mayor/granjero.png',
+                        'assets/img/Profesion/mujer_mayor/doctor.webp',
+                        'assets/img/Profesion/mujer_mayor/policia.webp',
+                        'assets/img/Profesion/mujer_mayor/bombero.webp',
+                        'assets/img/Profesion/mujer_mayor/chef.webp',
+                        'assets/img/Profesion/mujer_mayor/enfermera.webp',
+                        'assets/img/Profesion/mujer_mayor/mecanico.webp',
+                        'assets/img/Profesion/mujer_mayor/piloto.webp',
+                        'assets/img/Profesion/mujer_mayor/mesera.webp'
+                    ];
+                    break;
+                case 'Genero/masculino.jpg':
+                    imageUrls = [
+                        'assets/img/Profesion/adulto/architect.webp',
+                        'assets/img/Profesion/adulto/conductor.webp',
+                        'assets/img/Profesion/adulto/engineer.webp',
+                        'assets/img/Profesion/adulto/granjero.jpg',
+                        'assets/img/Profesion/adulto/doctor.jpg',
+                        'assets/img/Profesion/adulto/policia.jpg',
+                        'assets/img/Profesion/adulto/bombero.jpg',
+                        'assets/img/Profesion/adulto/chef.jpg',
+                        'assets/img/Profesion/adulto/enfermero.jpg',
+                        'assets/img/Profesion/adulto/mecanico.webp',
+                        'assets/img/Profesion/adulto/piloto.jpg',
+                        'assets/img/Profesion/adulto/mesero.jpg'
+                    ];
+                    break;
+                case 'edad/homer_mayor.jpg':
+                    imageUrls = [
+                        'assets/img/Profesion/hombre_mayor/arquitecto.webp',
+                        'assets/img/Profesion/hombre_mayor/conductor.webp',
+                        'assets/img/Profesion/hombre_mayor/ingeniero.webp',
+                        'assets/img/Profesion/hombre_mayor/granjero.webp',
+                        'assets/img/Profesion/hombre_mayor/doctor.webp',
+                        'assets/img/Profesion/hombre_mayor/policia.webp',
+                        'assets/img/Profesion/hombre_mayor/bombero.webp',
+                        'assets/img/Profesion/hombre_mayor/chef.webp',
+                        'assets/img/Profesion/hombre_mayor/enfermero.webp',
+                        'assets/img/Profesion/hombre_mayor/mecanico.webp',
+                        'assets/img/Profesion/hombre_mayor/piloto.webp',
+                        'assets/img/Profesion/hombre_mayor/mesero.webp'
+                    ];
+                    break;
+            }
+            addImagesToButton3(imageUrls);
+        }
+
+        function addImagesToButton3(imageUrls) {
+            imageUrls.forEach(url => {
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Imagen Cuadrada';
+                img.className = 'square-image';
+                img.addEventListener('click', () => {
+                    audioButton.currentTime = 0; // REPRODUCE EL AUDIO
+                    audioButton.play(); // REPRODUCE EL AUDIO
+                    mainImage.src = img.src;
+                    btn3.classList.add('disabled');
+                    content3.style.display = 'none';
+                    btn4.classList.remove('disabled');
+                    content4.style.display = 'flex';
+                });
+                content3.appendChild(img);
+            });
+        }
+
+        btn2.addEventListener('click', () => {
+            if (!btn2.classList.contains('disabled')) {
+                audioButton.currentTime = 0; // REPRODUCE EL AUDIO
+                audioButton.play(); // REPRODUCE EL AUDIO
+                content2.style.display = content2.style.display === 'flex' ? 'none' : 'flex';
+            }
+        });
+
+        btn3.addEventListener('click', () => {
+            if (!btn3.classList.contains('disabled')) {
+                audioButton.currentTime = 0; // REPRODUCE EL AUDIO
+                audioButton.play(); // REPRODUCE EL AUDIO
+                content3.style.display = content3.style.display === 'flex' ? 'none' : 'flex';
+            }
+        });
+
+        btn4.addEventListener('click', () => {
+            if (!btn4.classList.contains('disabled')) {
+                audioButton.currentTime = 0; // REPRODUCE EL AUDIO
+                audioButton.play(); // REPRODUCE EL AUDIO
+                content4.style.display = content4.style.display === 'flex' ? 'none' : 'flex';
+            }
+        });
+
+        content4.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                audioButton.currentTime = 0; // REPRODUCE EL AUDIO
+                audioButton.play(); // REPRODUCE EL AUDIO
+                const newImage = document.createElement('img');
+                newImage.src = e.target.src;
+                newImage.classList.add('extra-image');
+                document.querySelector('.right-panel').appendChild(newImage);
+                btn4.classList.add('disabled');
+                content4.style.display = 'none';
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            audioRes.currentTime = 0; // REPRODUCE EL AUDIO
+            audioRes.play(); // REPRODUCE EL AUDIO
+            mainImage.src = "assets/img/Genero/adulto.webp";
+            const extraImages = document.querySelectorAll('.right-panel .extra-image');
+            extraImages.forEach(img => img.remove());
+            btn1.classList.remove('disabled');
+            btn2.classList.add('disabled');
+            btn3.classList.add('disabled');
+            btn4.classList.add('disabled');
+            content1.style.display = 'flex';
+            content2.style.display = 'none';
+            content3.style.display = 'none';
+            content4.style.display = 'none'; // Asegurar que el contenido del botón 4 esté colapsado
+        });
+    });
+</script>
+</body>
+</html>

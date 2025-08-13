@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Botones</title>
+<style>
+  :root {
+    --grad1: #004e9f;
+    --grad2: #007ae0;
+    --bg: #eef4fc;
+    --panel: #ffffff;
+    --ring: #e7eef9;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .container {
+    background: var(--panel);
+    border: 1px solid var(--ring);
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 24px;
+    background: linear-gradient(90deg, var(--grad1), var(--grad2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 28px;
+    font-weight: 800;
+  }
+
+  .button-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .button-list a {
+    display: block;
+    text-decoration: none;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--grad1);
+    background: #f7faff;
+    border: 1px solid var(--ring);
+    transition: background .2s ease, color .2s ease, transform .15s ease;
+    text-align: center;
+  }
+
+  .button-list a:hover {
+    background: linear-gradient(135deg, var(--grad1), var(--grad2));
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Practices</h1>
+  <div class="button-list">
+    <a href="P_20/index20gif.html">Tablero de videos</a>
+    <a href="P_Avatar/indexAvatar.html">Avatar</a>
+    <a href="P_Carreras/indexCarreras.html">Carrera</a>
+    <a href="P_Carrusel/indexCarrusel.html">Carrusel de imágenes</a>
+    <a href="P_Cartaale/indexCartaAleatoria2.html">Carta Aleatoria</a>
+    <a href="P_jeopardy/indexJeopardy.html">Jeopardy</a>
+    <a href="P_Map/indexMap.html">Mapa</a>
+    <a href="P_Revelaimg/indexRevImg.html">Juego de cartas</a>
+    <a href="P_Ruleta/indexRuleta.html">Ruleta</a>
+    <a href="P_Tablero/indexTablero.html">Juego de mesa</a>
+  </div>
+</div>
+
+</body>
+</html>

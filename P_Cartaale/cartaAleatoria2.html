@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Juego Persona + Objeto</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(2, 280px);
+      grid-template-rows: repeat(2, 280px);
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .deck, .display {
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e6f0ff;
+      border: 2px dashed #99bfff;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+.deck2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('assets/img/cover.jpg'); /* <-- Tu imagen de cover */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-image 0.3s ease;
+}
+.deck3 {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('assets/img/cover2.jpg'); /* <-- Tu imagen de cover */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-image 0.3s ease;
+}
+.deck2:hover {
+	transform: scale(1.05);
+	transition: transform 0.3s ease;
+}
+.deck:hover {
+	transform: scale(1.05);
+	transition: transform 0.3s ease;
+}
+
+.deck2.revealed {
+  background-image: none; /* Oculta el cover */
+}
+
+    .deck img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+
+    button {
+      margin-top: 20px;
+      background: #1a3473;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 60px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+          background-color: #2955a5;
+    transform: scale(1.05); /* Aumenta el tamaño un 5% */
+    }
+
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="deck2" id="deckPerson" onclick="drawPerson()"></div>
+  <div class="deck3" id="deckObject" onclick="drawObject()"></div>
+  <div class="deck" id="displayPerson"></div>
+  <div class="deck" id="displayObject"></div>
+</div>
+
+<button onclick="resetGame()"><i class="fas fa-rotate-left"></i></button>
+
+<script>
+  const people = [
+    "01.png", "02.png", "03.png", "04.png", "05.png",
+    "06.png", "07.png", "08.png", "09.png", "10.png"
+  ];
+
+  const objects = [
+    "01.png", "02.png", "03.png", "04.png", "05.png",
+    "06.png", "07.png", "08.png", "09.png", "10.png"
+  ];
+
+  let personIndex = 0;
+  let objectIndex = 0;
+  
+  // Declarar los audios al inicio
+  const cardSound = new Audio('assets/audios/Card.wav');
+  const resetSound = new Audio('assets/audios/Res.wav');
+
+  function drawPerson() {
+    // Reproduce el sonido de la carta
+    cardSound.currentTime = 0;
+    cardSound.play();
+    
+    const container = document.getElementById('displayPerson');
+    const deck = document.getElementById('deckPerson');
+    container.innerHTML = `<img src="assets/img/personas/${people[personIndex]}" alt="Persona">`;
+    personIndex = (personIndex + 1) % people.length;
+    deck.classList.add('cover-hidden'); // Oculta el cover
+  }
+
+  function drawObject() {
+    // Reproduce el sonido de la carta
+    cardSound.currentTime = 0;
+    cardSound.play();
+    
+    const container = document.getElementById('displayObject');
+    const deck = document.getElementById('deckObject');
+    container.innerHTML = `<img src="assets/img/objetos/${objects[objectIndex]}" alt="Objeto">`;
+    objectIndex = (objectIndex + 1) % objects.length;
+    deck.classList.add('cover-hidden'); // Oculta el cover
+  }
+
+  function resetGame() {
+    // Reproduce el sonido de reinicio
+    resetSound.currentTime = 0;
+    resetSound.play();
+    
+    document.getElementById('displayPerson').innerHTML = '';
+    document.getElementById('displayObject').innerHTML = '';
+    personIndex = 0;
+    objectIndex = 0;
+
+    document.getElementById('deckPerson').classList.remove('cover-hidden');
+    document.getElementById('deckObject').classList.remove('cover-hidden');
+  }
+</script>
+
+</body>
+</html>

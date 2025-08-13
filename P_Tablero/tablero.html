@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero con Dado</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            user-select: none;
+            padding: 0 10px;
+        }
+
+        .game-board {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .board-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .token {
+            position: absolute;
+            width: 15px;
+            cursor: grab;
+            user-select: none;
+            z-index: 10;
+        }
+
+        .token1 { top: 54%; left: 6%; }
+        .token2 { top: 60%; left: 9%; }
+        .token3 { top: 66%; left: 6%; }
+        .token4 { top: 60%; left: 3%; }
+
+        /* DADO EN 3D */
+        .scene {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 80px;
+            height: 80px;
+            perspective: 600px;
+            z-index: 20;
+        }
+
+        .cube {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(0deg) rotateY(0deg);
+            transition: transform 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+        }
+
+        .face {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #007bff;
+            border: 2px solid #1976d2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+        }
+
+        .dot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .top-left { top: 10px; left: 12px; }
+        .top-right { top: 10px; right: 12px; }
+        .middle-left { top: 27px; left: 12px; }
+        .middle-right { top: 27px; right: 12px; }
+        .bottom-left { bottom: 10px; left: 12px; }
+        .bottom-right { bottom: 10px; right: 12px; }
+        
+        .front { transform: rotateY(0deg) translateZ(30px); }
+        .back { transform: rotateY(180deg) translateZ(30px); }
+        .right { transform: rotateY(90deg) translateZ(30px); }
+        .left { transform: rotateY(-90deg) translateZ(30px); }
+        .top { transform: rotateX(90deg) translateZ(30px); }
+        .bottom { transform: rotateX(-90deg) translateZ(30px); }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .popup {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .popup h2 {
+            margin-bottom: 25px;
+            font-size: 32px;
+            color: #007bff;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .player-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .player-buttons button {
+            background-color: #213267;
+            color: #ffffff;
+            border: none;
+            padding: 15px 25px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .player-buttons button:hover {
+            background-color: #4359a0;
+            transform: scale(1.05);
+        }
+
+        #resetButton {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            padding: 12px 58px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #213267;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #resetButton:hover {
+            background-color: #3b4d89;
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        /* NUEVO: Estilos para los cuadrados "Q" */
+        .question-squares {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1; /* Esto hace que los cuadrados se vean encima del tablero */
+        }
+
+        .question-square {
+            position: absolute;
+            width: 12.8%; 
+            height: 12.5%; 
+       
+        }
+
+        /* Posiciones de cada cuadrado "Q" */
+        #question1 { top: 29%; left: 14.4%; }
+        #question2 { top: 43.4%; left: 43.3%; }
+        #question3 { top: 58%; left: 72.2%; }
+        
+        .start-square {
+            position: absolute;
+            width: 12.8%; 
+            height: 12.5%; 
+   
+            top: 86.8%;
+            left: 0%; 
+        }
+        
+        /* NUEVO: Estilos para el cuadrado "Finish" */
+        .finish-square {
+            position: absolute;
+            width: 12.8%; 
+            height: 12.5%; 
+ 
+            top: 0%;
+            left: 86.7%;
+        }
+
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(0) rotateZ(0); opacity: 1; }
+            100% { transform: translateY(100vh) rotateZ(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+
+<body>
+    <button id="resetButton"> <i class="fas fa-rotate-left"></i></button>
+
+    <div class="game-board">
+        <img src="assets/img/table.png" alt="Tablero" class="board-image">
+        
+        <img src="assets/img/01.png" class="token token1" draggable="false">
+        <img src="assets/img/02.png" class="token token2" draggable="false">
+        <img src="assets/img/03.png" class="token token3" draggable="false">
+        <img src="assets/img/04.png" class="token token4" draggable="false">
+
+        <section class="scene">
+            <div class="cube" id="dice">
+                <div class="face front">
+                    <span class="dot center"></span>
+                </div>
+                <div class="face bottom">
+                    <span class="dot top-left"></span>
+                    <span class="dot bottom-right"></span>
+                </div>
+                <div class="face right">
+                    <span class="dot top-left"></span>
+                    <span class="dot center"></span>
+                    <span class="dot bottom-right"></span>
+                </div>
+                <div class="face left">
+                    <span class="dot top-left"></span>
+                    <span class="dot top-right"></span>
+                    <span class="dot bottom-left"></span>
+                    <span class="dot bottom-right"></span>
+                </div>
+                <div class="face top">
+                    <span class="dot top-left"></span>
+                    <span class="dot top-right"></span>
+                    <span class="dot center"></span>
+                    <span class="dot bottom-left"></span>
+                    <span class="dot bottom-right"></span>
+                </div>
+                <div class="face back">
+                    <span class="dot top-left"></span>
+                    <span class="dot top-right"></span>
+                    <span class="dot middle-left"></span>
+                    <span class="dot middle-right"></span>
+                    <span class="dot bottom-left"></span>
+                    <span class="dot bottom-right"></span>
+                </div>
+            </div>
+        </section>
+
+        <div class="question-squares">
+            <div id="question1" class="question-square"></div>
+            <div id="question2" class="question-square"></div>
+            <div id="question3" class="question-square"></div>
+            <div id="start-square" class="start-square"></div>
+            <div id="finish-square" class="finish-square"></div>
+        </div>
+    </div>
+    
+    <div class="confetti-container"></div>
+
+    <div class="overlay" id="playerOverlay">
+        <div class="popup">
+            <h2>Teams!</h2>
+            <div class="player-buttons">
+                <button class="player-select" data-players="1">1</button>
+                <button class="player-select" data-players="2">2</button>
+                <button class="player-select" data-players="3">3</button>
+                <button class="player-select" data-players="4">4</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="diceSound">
+        <source src="assets/audios/dice.wav" type="audio/wav">
+    </audio>
+    <audio id="tokenSound">
+        <source src="assets/audios/Bubble.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // --- NUEVO: Guarda las posiciones iniciales de las fichas ---
+        const initialTokenPositions = {};
+        const tokens = document.querySelectorAll('.token');
+        const playerSelectButtons = document.querySelectorAll('.player-select');
+        const resetButton = document.getElementById('resetButton');
+
+        // NUEVOS elementos para los cuadrados "Q", "Start" y "Finish"
+        const questionSquares = document.querySelectorAll('.question-square');
+        const startSquare = document.getElementById('start-square');
+        const finishSquare = document.getElementById('finish-square'); // Obtenemos el nuevo cuadrado
+
+        // 🔊 Audio files
+        const diceSound = new Audio('assets/audios/dice.wav');
+        const tokenSound = new Audio('assets/audios/Bubble.mp3');
+        const transitionSound = new Audio('assets/audios/Transition.mp3');
+        const playSound = new Audio('assets/audios/Play.wav');
+        const resetSound = new Audio('assets/audios/Res.wav');
+        const bonusSound = new Audio('assets/audios/Bonus.wav');
+        const enterSound = new Audio('assets/audios/Enter.wav');
+        const celebrationSound = new Audio('assets/audios/Celebration.mp3'); // El nuevo audio de "Celebration"
+
+
+        // Función para reproducir sonidos de forma confiable
+        function playAudio(audioElement) {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+            audioElement.play().catch(e => console.error("Error playing audio:", e));
+        }
+
+        tokens.forEach(token => {
+            // Usamos el id de la ficha para guardar su posición inicial
+            initialTokenPositions[token.classList[1]] = {
+                top: window.getComputedStyle(token).getPropertyValue('top'),
+                left: window.getComputedStyle(token).getPropertyValue('left')
+            };
+        });
+
+        // Lógica del dado
+        const dice = document.getElementById('dice');
+        const rotations = [
+            { x: 0, y: 0 },    // 1 (front)
+            { x: 90, y: 0 },    // 2 (bottom)
+            { x: 0, y: -90 },   // 3 (right)
+            { x: 0, y: 90 },    // 4 (left)
+            { x: -90, y: 0 },   // 5 (top)
+            { x: 0, y: 180 }    // 6 (back)
+        ];
+
+        // Lógica para el cambio de color de fondo y turnos
+        const body = document.body;
+        const playerColors = ['#ffcccc', '#ccf0ff', '#ccffcc', '#ffccf6']; // Rojo, Azul, Verde, Rosa
+        let currentPlayer = 0;
+        let numPlayers = 0;
+
+
+        dice.addEventListener('click', () => {
+            playAudio(diceSound);
+
+            const roll = Math.floor(Math.random() * 6);
+            const final = rotations[roll];
+            const extraX = 360 * (Math.floor(Math.random() * 4) + 3);
+            const extraY = 360 * (Math.floor(Math.random() * 4) + 3);
+            const totalX = final.x + extraX;
+            const totalY = final.y + extraY;
+            dice.style.transition = 'transform 1.5s cubic-bezier(0.23, 1, 0.32, 1)';
+            dice.style.transform = `rotateX(${totalX}deg) rotateY(${totalY}deg)`;
+
+            // Lógica para cambiar el color de fondo del turno
+            if (numPlayers > 0) {
+                body.style.backgroundColor = playerColors[currentPlayer];
+                currentPlayer = (currentPlayer + 1) % numPlayers;
+            }
+        });
+
+        // Lógica de la ventana emergente para selección de jugadores
+        playerSelectButtons.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                playAudio(transitionSound); // Sonido al pasar el ratón
+            });
+
+            btn.addEventListener('click', () => {
+                playAudio(playSound); // Sonido al hacer clic
+                numPlayers = parseInt(btn.dataset.players);
+                for (let i = 1; i <= 4; i++) {
+                    const token = document.querySelector(`.token${i}`);
+                    if (token) {
+                        if (i <= numPlayers) {
+                            token.style.display = 'block';
+                        } else {
+                            token.style.display = 'none';
+                        }
+                    }
+                }
+                document.getElementById('playerOverlay').style.display = 'none';
+            });
+        });
+
+        window.addEventListener('load', () => {
+            document.getElementById('playerOverlay').style.display = 'flex';
+        });
+
+        // Lógica para el nuevo botón de Reiniciar
+        resetButton.addEventListener('click', () => {
+            playAudio(resetSound); // Sonido de reinicio
+            // Restablece la posición de todas las fichas a sus valores iniciales guardados
+            tokens.forEach(token => {
+                const initialPos = initialTokenPositions[token.classList[1]];
+                token.style.top = initialPos.top;
+                token.style.left = initialPos.left;
+                token.style.display = 'none'; // Oculta las fichas después de moverlas
+            });
+
+            // Restablece el color de fondo a blanco
+            body.style.backgroundColor = '#ffffff';
+
+            // Restablece el contador de jugadores
+            currentPlayer = 0;
+            numPlayers = 0;
+            
+            // Muestra la ventana de selección de jugadores
+            document.getElementById('playerOverlay').style.display = 'flex';
+        });
+
+        // --- Lógica para arrastrar y soltar fichas ---
+        tokens.forEach(token => {
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            // Evento para comenzar a arrastrar
+            token.addEventListener('mousedown', (e) => {
+                playAudio(tokenSound); // Reproduce el sonido de la ficha al tomarla
+                isDragging = true;
+                token.style.cursor = 'grabbing';
+                
+                // Obtenemos la posición inicial del mouse relativa al token
+                offsetX = e.clientX - token.getBoundingClientRect().left;
+                offsetY = e.clientY - token.getBoundingClientRect().top;
+            });
+
+            // Evento para arrastrar el token
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                // Obtenemos la posición del tablero para calcular las coordenadas relativas
+                const board = document.querySelector('.game-board');
+                const boardRect = board.getBoundingClientRect();
+                
+                // Calculamos las nuevas posiciones relativas al tablero
+                const newLeft = ((e.clientX - boardRect.left - offsetX) / boardRect.width) * 100;
+                const newTop = ((e.clientY - boardRect.top - offsetY) / boardRect.height) * 100;
+                
+                // Actualizamos la posición del token
+                token.style.left = `${newLeft}%`;
+                token.style.top = `${newTop}%`;
+            });
+
+            // Evento para soltar el token
+            document.addEventListener('mouseup', () => {
+                if (!isDragging) return;
+
+                playAudio(tokenSound); // Reproduce el sonido de la ficha al soltarla
+                isDragging = false;
+                token.style.cursor = 'grab';
+                
+                // Unificamos la lógica en una sola función
+                checkForSpecialSquares(token);
+            });
+        });
+
+
+// NUEVA FUNCIÓN: Utiliza la librería canvas-confetti para el efecto
+function triggerConfetti() {
+  const duration = 5 * 1000; // Aumenta la duración a 5 segundos
+  const end = Date.now() + duration;
+  const defaults = { startVelocity: 30, spread: 360, decay: 0.94, scalar: 0.8 };
+
+  // Lanza una explosión central al principio
+  confetti({
+    particleCount: 200, // Partículas de la explosión inicial
+    startVelocity: 50,
+    spread: 360,
+    origin: { x: 0.5, y: 0.5 }
+  });
+
+  // Función para generar confeti en ráfagas
+  function doConfetti(particleRatio, opts) {
+    const endConfetti = Date.now() + (0.5 * duration);
+    const interval = setInterval(function() {
+      const timeLeft = endConfetti - Date.now();
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+      // Aumenta el número de partículas base a 150 (antes era 50)
+      const particleCount = 150 * particleRatio; 
+      confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random() - 0.2 } }, opts));
+    }, 250);
+  }
+
+  // Lanza diferentes tipos de confeti con más partículas
+  doConfetti(0.25, { spread: 26, startVelocity: 55 });
+  doConfetti(0.2, { spread: 60 });
+  doConfetti(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+  doConfetti(0.1, { spread: 120, startVelocity: 25, tilt: 0.6 });
+  doConfetti(0.15, { spread: 120, startVelocity: 45 });
+}
+
+
+        // NUEVA Y ÚNICA FUNCIÓN: Verificar si el token está en un cuadrado especial
+        function checkForSpecialSquares(token) {
+            const tokenRect = token.getBoundingClientRect();
+            const specialSquares = document.querySelectorAll('.question-square, .start-square, .finish-square');
+
+            specialSquares.forEach(square => {
+                const squareRect = square.getBoundingClientRect();
+
+                if (
+                    tokenRect.right > squareRect.left &&
+                    tokenRect.left < squareRect.right &&
+                    tokenRect.bottom > squareRect.top &&
+                    tokenRect.top < squareRect.bottom
+                ) {
+                    if (square.classList.contains('question-square')) {
+                        playAudio(bonusSound);
+                    } else if (square.classList.contains('start-square')) {
+                        playAudio(enterSound);
+                    } else if (square.classList.contains('finish-square')) {
+                        playAudio(celebrationSound);
+                        triggerConfetti();
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

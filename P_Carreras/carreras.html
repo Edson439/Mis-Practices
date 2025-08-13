@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Juego de Carreras</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+	  overflow: hidden;
+    }
+
+    .track-container {
+      width: 90%;
+      max-width: 1920px;
+      aspect-ratio: 1920 / 501;
+      position: relative;
+      background-image: url('assets/img/pista.png');
+      background-size: cover;
+      background-position: center;
+    }
+
+.car {
+  position: absolute;
+  width: 100px;
+  max-width: 8vw;
+  transition: left 4s ease;
+  cursor: pointer;
+}
+
+.car1 { top: 20%; left: 0%; }
+.car2 { top: 60%; left: 0%; }
+
+    #resetButton {
+      margin-top: 20px;
+      background-color: #1a3473;
+      color: white;
+      padding: 10px 54px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #resetButton:hover {
+		background-color: #2955a5;
+		transform: scale(1.05);
+		}
+
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;;
+    }
+
+    .popup {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 24px;
+      color: #333;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: popupFade 0.4s ease-in-out;
+    }
+
+    .popup button {
+      margin-top: 20px;
+      padding: 10px 50px;
+      font-size: 16px;
+      background-color: #1a3473;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .popup button:hover {
+      background-color: #2955a5;
+    }
+
+    @keyframes popupFade {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+	  
+#popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 20, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 90;
+}
+
+#popupContent {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  width: 400px;
+}
+
+.popupImage {
+  width: 100px;
+}
+
+#popupContent button {
+  background-color: #1a3473;
+  color: white;
+  padding: 10px 54px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#popupContent button:hover {
+  background-color: #2955a5;
+}
+
+	  #popupContent h2{
+		  color: #007bff;
+		  font-size: 36px;
+	  }	
+#player1Selection img,
+#player2Selection img {
+  width: 80px;
+  margin: 10px;
+  border: 3px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s, border-color 0.3s;
+}
+#player1Selection img:hover,
+#player2Selection img:hover {
+  transform: scale(1.1);
+  border-color: #007bff;
+}
+	  
+.selected {
+  border-color: #28a745 !important; /* Un verde más oscuro */
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(40, 167, 69, 0.7); /* Sombra verde con transparencia */
+  padding: 10px;
+}
+  </style>
+</head>
+<body>
+<div id="carSelectionOverlay" class="popup-overlay" style="display: flex;">
+  <div class="popup">
+    <h2 style="color:#007bff;">Select your car</h2>
+    <p><strong>Team 1:</strong></p>
+    <div id="player1Selection">
+      <img src="assets/img/cars-01.png" onclick="selectCar(1, 'cars-01.png')">
+      <img src="assets/img/cars-02.png" onclick="selectCar(1, 'cars-02.png')">
+      <img src="assets/img/cars-03.png" onclick="selectCar(1, 'cars-03.png')">
+      <img src="assets/img/cars-04.png" onclick="selectCar(1, 'cars-04.png')">
+      <img src="assets/img/cars-05.png" onclick="selectCar(1, 'cars-05.png')">
+    </div>
+
+    <p id="team2Label" style="display: none;"><strong>Team 2:</strong></p>
+    <div id="player2Selection">
+      <!-- Se llenará con los carros restantes -->
+    </div>
+
+    <button onclick="startGame()" id="startButton" style="display:none; margin-top:20px;">Start</button>
+  </div>
+</div>
+
+  <div class="track-container" id="track">
+    <img src="assets/img/cars-01.png" alt="Carro 1" class="car car1" onclick="moveCar(1)">
+    <img src="assets/img/cars-02.png" alt="Carro 2" class="car car2" onclick="moveCar(2)">
+  </div>
+
+  <button id="resetButton" onclick="resetGame()"><i class="fas fa-rotate-left"></i></button>
+
+<!-- Popup de ganador -->
+<div id="popupOverlay" style="display: none;">
+  <div id="popupContent">
+    <img src="assets/img/winner.png" alt="Ganador" class="popupImage">
+    <h2 id="popupText">Winner!</h2>
+    <button class="resetButton" onclick="resetGame()"><i class="fas fa-rotate-left"></i></button>
+  </div>
+</div>
+
+<script>
+  const totalClicks = 5;
+  let car1Clicks = 0;
+  let car2Clicks = 0;
+  let selectedCar1 = null;
+  let selectedCar2 = null;
+
+  // Declarar los objetos de audio
+  const moveSound = new Audio("assets/audios/car.wav");
+  const winSound = new Audio("assets/audios/winner.mp3");
+  const selectSound = new Audio("assets/audios/Button_1.wav"); // Nuevo audio de selección
+  const startSound = new Audio("assets/audios/Start.mp3"); // Nuevo audio de Start
+  const resetSound = new Audio("assets/audios/Res.wav"); // Nuevo audio de Reset
+
+  function moveCar(carNumber) {
+    const track = document.getElementById("track");
+    const trackWidth = track.clientWidth;
+    let car = document.querySelector(`.car${carNumber}`);
+
+    if (carNumber === 1 && car1Clicks < totalClicks) {
+      car1Clicks++;
+      let left = (car1Clicks / totalClicks) * trackWidth;
+      car.style.left = `${left}px`;
+      moveSound.currentTime = 0;
+      moveSound.play();
+      if (car1Clicks === totalClicks) showPopup("¡Carro 1 gana la carrera!");
+    }
+
+    if (carNumber === 2 && car2Clicks < totalClicks) {
+      car2Clicks++;
+      let left = (car2Clicks / totalClicks) * trackWidth;
+      car.style.left = `${left}px`;
+      moveSound.currentTime = 0;
+      moveSound.play();
+      if (car2Clicks === totalClicks) showPopup("¡Carro 2 gana la carrera!");
+    }
+  }
+
+  function showPopup(message) {
+    document.getElementById("popupText").textContent = message;
+    document.getElementById("popupOverlay").style.display = "flex";
+    winSound.currentTime = 0;
+    winSound.play();
+    launchConfetti();
+  }
+
+  function launchConfetti() {
+    const duration = 2 * 1000;
+    const end = Date.now() + duration;
+
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      canvas.style.zIndex = '9999';
+      canvas.style.position = 'fixed';
+      canvas.style.pointerEvents = 'none';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+    }
+
+    (function frame() {
+      confetti({
+        particleCount: 6,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+      });
+      confetti({
+        particleCount: 6,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    })();
+  }
+
+  function resetGame() {
+    resetSound.currentTime = 0; // Reproduce el sonido de reinicio
+    resetSound.play(); // Reproduce el sonido de reinicio
+    car1Clicks = 0;
+    car2Clicks = 0;
+    document.querySelector('.car1').style.left = '0%';
+    document.querySelector('.car2').style.left = '0%';
+    document.getElementById("popupOverlay").style.display = "none";
+  }
+
+  function startGame() {
+    startSound.currentTime = 0; // Reproduce el sonido de start
+    startSound.play(); // Reproduce el sonido de start
+    if (!selectedCar1 || !selectedCar2) return;
+    document.getElementById("carSelectionOverlay").style.display = "none";
+    document.getElementById("track").classList.remove("hidden");
+    document.getElementById("resetButton").classList.remove("hidden");
+    const track = document.getElementById("track");
+    track.innerHTML = "";
+    const car1 = document.createElement("img");
+    car1.src = `assets/img/${selectedCar1}`;
+    car1.classList.add("car", "car1");
+    car1.style.width = '100px';
+    car1.onclick = () => moveCar(1);
+    track.appendChild(car1);
+    const car2 = document.createElement("img");
+    car2.src = `assets/img/${selectedCar2}`;
+    car2.classList.add("car", "car2");
+    car2.style.width = '100px';
+    car2.onclick = () => moveCar(2);
+    track.appendChild(car2);
+  }
+
+  function selectCar(player, car) {
+    selectSound.currentTime = 0; // Reproduce el sonido de selección
+    selectSound.play(); // Reproduce el sonido de selección
+    const player1Cars = document.querySelectorAll("#player1Selection img");
+    
+    if (player === 1) {
+      selectedCar1 = car;
+      player1Cars.forEach(img => img.classList.remove("selected"));
+      const selectedImg = document.querySelector(`#player1Selection img[src='assets/img/${car}']`);
+      if (selectedImg) {
+        selectedImg.classList.add("selected");
+      }
+      document.getElementById("team2Label").style.display = 'block';
+      document.getElementById("player2Selection").innerHTML = '';
+      const allCars = ["cars-01.png", "cars-02.png", "cars-03.png", "cars-04.png", "cars-05.png"];
+      const remaining = allCars.filter(c => c !== selectedCar1);
+      remaining.forEach(c => {
+        const img = document.createElement('img');
+        img.src = `assets/img/${c}`;
+        img.onclick = () => selectCar(2, c);
+        document.getElementById("player2Selection").appendChild(img);
+      });
+    } else if (player === 2) {
+      selectedCar2 = car;
+      const player2Cars = document.querySelectorAll("#player2Selection img");
+      player2Cars.forEach(img => img.classList.remove("selected"));
+      const selectedImg = document.querySelector(`#player2Selection img[src='assets/img/${car}']`);
+      if (selectedImg) {
+        selectedImg.classList.add("selected");
+      }
+      document.getElementById("startButton").style.display = "inline-block";
+    }
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+
+</body>
+</html>

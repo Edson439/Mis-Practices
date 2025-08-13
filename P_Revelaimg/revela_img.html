@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juego de Descubrir Imagen</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+	body {
+	  font-family: sans-serif;
+	  background: white;
+	  margin: 0;
+	  min-height: 100vh;
+	  display: flex;
+	  flex-direction: column;
+	  justify-content: center;  /* Centra verticalmente */
+	  align-items: center;      /* Centra horizontalmente */
+	}
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 130px);
+      grid-template-rows: repeat(4, 130px);
+      gap: 5px;
+      justify-content: center;
+      margin: 20px auto;
+      position: relative;
+    }
+
+	.cell {
+	  background-color: #dff0ff;
+	  border-radius: 5px;
+	  background-size: 520px 520px;
+	  background-repeat: no-repeat;
+	  background-position: center;
+	  opacity: 1;
+	  transition: opacity 0.3s ease-in-out;
+	}
+
+	.cell.hidden {
+	  background-image: none !important;
+	}
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+	button {
+	  background: #1a3473;
+	  border: none;
+	  border-radius: 6px;
+	  padding: 14px 24px;
+	  color: white;
+	  cursor: pointer;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  min-width: 172px;
+	}
+
+	button i {
+	  font-size: 18px;
+	  color: white;
+	  display: inline-block;
+	}
+	.counter {
+	  font-size: 16px;
+	  margin-bottom: 0px;
+	  color: #1a3473;
+	}
+
+  </style>
+</head>
+<body>
+  <div class="counter" id="counter">1 / 10</div>
+  <div class="grid" id="grid"></div>
+
+  <div class="controls">
+    <button onclick="showImage()" title="Mostrar"><i class="fas fa-eye"></i></button>
+    <button onclick="revealSquare()" title="Revelar"><i class="fas fa-hand-pointer"></i></button>
+    <button onclick="nextImage()" title="Siguiente"><i class="fas fa-arrow-right"></i></button>
+
+  </div>
+
+<script>
+    // --- Cargar los audios ---
+    const revealSound = new Audio('assets/audios/Pop_Reveal.wav');
+    const showSound = new Audio('assets/audios/Confirm_Reveal.wav');
+    const nextSound = new Audio('assets/audios/Continue.wav');
+
+    // Función para reproducir un sonido
+    const playSound = (audioElement) => {
+        audioElement.pause();
+        audioElement.currentTime = 0;
+        audioElement.play().catch(error => {
+            console.error("Autoplay prevented:", error);
+        });
+    };
+
+    const grid = document.getElementById('grid');
+    const totalSquares = 16;
+    let currentImage = 1;
+    let revealed = [];
+
+    function createGrid() {
+        grid.innerHTML = '';
+        revealed = [];
+
+        for (let i = 0; i < totalSquares; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            const row = Math.floor(i / 4);
+            const col = i % 4;
+            const posX = -(col * 130);
+            const posY = -(row * 130);
+            cell.style.backgroundPosition = `${posX}px ${posY}px`;
+            cell.dataset.index = i;
+            grid.appendChild(cell);
+            cell.classList.add('hidden');
+        }
+    }
+
+    function revealSquare() {
+        playSound(revealSound);
+        const cells = Array.from(document.querySelectorAll('.cell'));
+        const unrevealed = cells.filter((cell, i) => !revealed.includes(i));
+        if (unrevealed.length === 0) return;
+        const randomCell = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+        const index = parseInt(randomCell.dataset.index);
+        const row = Math.floor(index / 4);
+        const col = index % 4;
+        const posX = -(col * 130);
+        const posY = -(row * 130);
+        randomCell.style.backgroundImage = `url('assets/img/${currentImage}.png')`;
+        randomCell.style.backgroundPosition = `${posX}px ${posY}px`;
+        randomCell.classList.remove('hidden');
+        revealed.push(index);
+    }
+
+
+    function showImage() {
+        playSound(showSound);
+        const cells = Array.from(document.querySelectorAll('.cell'));
+        cells.forEach((cell, i) => {
+            const row = Math.floor(i / 4);
+            const col = i % 4;
+            const posX = -(col * 130);
+            const posY = -(row * 130);
+            cell.style.backgroundImage = `url('assets/img/${currentImage}.png')`;
+            cell.style.backgroundPosition = `${posX}px ${posY}px`;
+            cell.classList.remove('hidden');
+        });
+        revealed = [...Array(totalSquares).keys()];
+    }
+
+
+    function nextImage() {
+        playSound(nextSound);
+        currentImage = currentImage < 10 ? currentImage + 1 : 1;
+        createGrid();
+        document.getElementById('counter').textContent = `${currentImage} / 10`;
+    }
+
+    createGrid();
+</script>
+</body>
+</html>
