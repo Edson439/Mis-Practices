@@ -18,10 +18,10 @@ const playBtn = document.getElementById('customPlayBtn');
 const loadingOverlay = document.getElementById('videoLoading');
 const video = document.getElementById('mainVideo');
 
-// Agregamos la referencia al audio de la sección 'student'
+// Agregamos la referencia al audio de la secciÃ³n 'student'
 const studentAudio = new Audio('assets/audios/Opener.mp3'); // Cambia la ruta a la de tu archivo de audio si es diferente
 
-// Función para cambiar el video con transición estilo Shorts
+// FunciÃ³n para cambiar el video con transiciÃ³n estilo Shorts
 function changeVideo(index, direction = 'down') {
   if (index >= 0 && index < videos.length) {
     currentIndex = index;
@@ -29,7 +29,7 @@ function changeVideo(index, direction = 'down') {
     // Elimina clases anteriores
     video.classList.remove('slide-in-up', 'slide-out-up', 'slide-in-down', 'slide-out-down');
 
-    // Agrega animación de salida según dirección
+    // Agrega animaciÃ³n de salida segÃºn direcciÃ³n
     if (direction === 'up') {
       video.classList.add('slide-out-down'); // Sale hacia abajo
     } else {
@@ -81,7 +81,7 @@ arrowUp.addEventListener('click', () => {
 
   if (section === 'film') {
     if (currentIndex > 0) {
-      changeVideo(currentIndex - 1, 'up'); // ? cambio aquí
+      changeVideo(currentIndex - 1, 'up'); // ? cambio aquÃ­
     }
   } else if (sectionCards[section]) {
     const sec = sectionCards[section];
@@ -139,7 +139,7 @@ document.querySelectorAll('.menu-item').forEach(item => {
   const hoverSrc = originalSrc.replace('.png', '_2.png');
 
   item.addEventListener('mouseenter', () => {
-    // Solo aplica el hover si el item no está deshabilitado
+    // Solo aplica el hover si el item no estÃ¡ deshabilitado
     if (!item.classList.contains('disabled')) {
       img.setAttribute('src', hoverSrc);
     }
@@ -162,11 +162,11 @@ const menuStudent = document.getElementById('menuStudent');
 // Navegacion por secciones
 menuFilm.addEventListener('click', (e) => {
   e.preventDefault();
-  // No hacemos nada si está deshabilitado
+  // No hacemos nada si estÃ¡ deshabilitado
 });
 menuVocabulary.addEventListener('click', (e) => {
   e.preventDefault();
-  // No hacemos nada si está deshabilitado
+  // No hacemos nada si estÃ¡ deshabilitado
 });
 menuPractice.addEventListener('click', (e) => {
   e.preventDefault();
@@ -174,11 +174,11 @@ menuPractice.addEventListener('click', (e) => {
 });
 menuColorChart.addEventListener('click', (e) => {
   e.preventDefault();
-  // No hacemos nada si está deshabilitado
+  // No hacemos nada si estÃ¡ deshabilitado
 });
 menuWhiteboard.addEventListener('click', (e) => {
   e.preventDefault();
-  // No hacemos nada si está deshabilitado
+  // No hacemos nada si estÃ¡ deshabilitado
 });
 menuStudent.addEventListener('click', (e) => {
   e.preventDefault();
@@ -191,7 +191,7 @@ function showSection(sectionToShow) {
     return; // Ignora el intento de mostrar otras secciones
   }
 
-  // Primero, detener el audio si se está reproduciendo
+  // Primero, detener el audio si se estÃ¡ reproduciendo
   studentAudio.pause();
   studentAudio.currentTime = 0; // Reiniciar el audio
 
@@ -202,7 +202,7 @@ function showSection(sectionToShow) {
     document.getElementById(id).style.display = 'none';
   });
 
-  // Si la sección a mostrar es 'student', reproducir el audio
+  // Si la secciÃ³n a mostrar es 'student', reproducir el audio
   if (sectionToShow === 'student') {
     studentAudio.play().catch(error => {
       console.error("Autoplay prevented:", error);
@@ -464,12 +464,12 @@ toggleSoundBtn.addEventListener('click', () => {
   icon.textContent = isSoundActive ? 'volume_up' : 'volume_off';
 });
 
-// Escucha solo los íconos en el Color Chart
+// Escucha solo los Ã­conos en el Color Chart
 document.querySelectorAll('#colorChartContent .chart-icon').forEach(icon => {
   icon.addEventListener('click', () => {
     const colorChart = document.getElementById('colorChartContent');
     if (colorChart.style.display !== 'none') {
-      if (!isSoundActive) return; // No hace nada si el sonido está apagado
+      if (!isSoundActive) return; // No hace nada si el sonido estÃ¡ apagado
 
       const soundNumber = icon.getAttribute('data-sound').padStart(2, '0');
       const audio = new Audio(`CC/sounds/CC${soundNumber}.mp3`);
@@ -502,34 +502,23 @@ function activarSidebar() {
   });
 }
 
-// Lógica para ejecutar al cargar la página
+// LÃ³gica para ejecutar al cargar la pÃ¡gina
 document.addEventListener('DOMContentLoaded', () => {
+  showSection('student');
   desactivarSidebar();
-  activarBoton(menuPractice);
   activarBoton(menuStudent);
   
-  // Deshabilita los botones del menú lateral que no se usan
+  // Deshabilita los botones del menÃº lateral que no se usan
   desactivarBoton(document.getElementById('mobileFilm'));
   desactivarBoton(document.getElementById('mobileVocabulary'));
   desactivarBoton(document.getElementById('mobileColorChart'));
   desactivarBoton(document.getElementById('mobileWhiteboard'));
   
-  // Muestra la sección de "practice" por defecto y activa su menú
+  // Muestra la secciÃ³n de "practice" por defecto y activa su menÃº
   showSection('practice');
   
-  // Agregamos la clase 'active' al menú y menú lateral de Practice
+  // Agregamos la clase 'active' al menÃº y menÃº lateral de Practice
   menuPractice.classList.add('active');
   document.getElementById('mobilePractice').classList.add('active');
-});document.addEventListener('DOMContentLoaded', () => {
-    // ... tu código existente ...
+})
 
-    const infoOverlay = document.getElementById('info-overlay-y9x8z');
-
-    // Muestra la imagen
-    infoOverlay.classList.add('show');
-
-    // Oculta la imagen después de 2 segundos (2000 milisegundos)
-    setTimeout(() => {
-        infoOverlay.classList.remove('show');
-    }, 3000);
-});
